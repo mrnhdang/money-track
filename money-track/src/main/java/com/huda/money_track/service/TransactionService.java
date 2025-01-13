@@ -25,10 +25,13 @@ public class TransactionService {
     private TransactionRepository transactionRepository;
     private MemberRepository memberRepository;
 
-    public List<Transaction> getTransactionList(int pageNumber) {
-        Pageable pageable = PageRequest.of(pageNumber, 5, Sort.by("transactionDatetime").descending());
-        Page<Transaction> transactions = transactionRepository.findAll(pageable);
-        return transactions.getContent();
+    public List<Transaction> getMemberTransactionList(int pageNumber, int pageSize, String sortBy, Integer memberId) {
+        Pageable pageable = PageRequest.of(pageNumber, pageSize, Sort.by(sortBy).descending());
+        if (memberId != null) {
+            Member member = checkExistMember(memberId);
+            return transactionRepository.findAllByMember(member, pageable);
+        }
+        return transactionRepository.findAll(pageable).getContent();
     }
 
     private Member checkExistMember(Integer memberId) {
