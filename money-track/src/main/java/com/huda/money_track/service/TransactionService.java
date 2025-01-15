@@ -75,4 +75,13 @@ public class TransactionService {
     public void deleteTransactionByID(Integer transactionId) {
         transactionRepository.deleteById(transactionId);
     }
+
+    public void deleteAllTransaction() {
+        transactionRepository.deleteAll();
+    }
+
+    public void deleteMemberAllTransaction(Integer memberId) {
+        Member member = checkExistMember(memberId);
+        transactionRepository.deleteAllByMember(member);
+    }
 }
