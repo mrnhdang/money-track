@@ -6,4 +6,4 @@ docker run --name my-pgadmin -p 82:80 -e PGADMIN_DEFAULT_EMAIL=laiba@yahoo.com -
 Have to run postgrsql first 
 # note
 We can use this line of code to get data from SecurityContextHolder:
---         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+--         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();gf

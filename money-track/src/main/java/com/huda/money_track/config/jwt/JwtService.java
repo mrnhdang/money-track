@@ -81,4 +81,11 @@ public class JwtService {
         // UserDetails only have username and password, we will use email as UserDetail's username because email is unique
         return (email.equals(userDetails.getUsername()) && !isTokenExpired(token));
     }
+
+    public String logoutToken(String token) {
+        final Claims claims = extractAllClaims(token);
+        claims.setExpiration(new Date());
+        return Jwts.builder().setClaims(claims).signWith(getSignKey()).compact();
+
+    }
 }
