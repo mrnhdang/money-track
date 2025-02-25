@@ -7,15 +7,11 @@ import com.huda.money_track.entity.Role;
 import com.huda.money_track.exception.InvalidInputParameter;
 import com.huda.money_track.exception.NotFoundException;
 import com.huda.money_track.repository.MemberRepository;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.web.authentication.logout.LogoutHandler;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -34,12 +30,24 @@ public class MemberService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         Optional<Member> member = memberRepository.findByEmail(username);
-        return member.map(UserInfoDetails::new).orElseThrow(() -> new NotFoundException("Member not exist."));
+        return member.map(UserInfoDetails::new).orElseThrow(() -> new NotFoundException("Wrong password or email."));
     }
 
     public String registerUser(Member userInfo) {
         if (memberRepository.findByEmail(userInfo.getEmail()).isPresent()) {
             throw new InvalidInputParameter("Email has already exist.");
+        }
+        if (userInfo.getEmail() == null || userInfo.getEmail().isEmpty() || userInfo.getEmail().isBlank()) {
+            throw new InvalidInputParameter("Email is required.");
+        }
+        if (userInfo.getUsername() == null || userInfo.getUsername().isEmpty() || userInfo.getUsername().isBlank()) {
+            throw new InvalidInputParameter("Username is required.");
+        }
+        if (userInfo.getPassword() == null || userInfo.getPassword().isEmpty() || userInfo.getPassword().isBlank()) {
+            throw new InvalidInputParameter("Password is required.");
+        }
+        if (userInfo.getRole() == null || userInfo.getRole().getName().isEmpty() || userInfo.getRole().getName().isBlank()) {
+            throw new InvalidInputParameter("Role is required.");
         }
         userInfo.setPassword(passwordEncoder.encode(userInfo.getPassword()));
         memberRepository.save(userInfo);

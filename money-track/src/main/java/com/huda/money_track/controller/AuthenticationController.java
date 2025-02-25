@@ -1,6 +1,7 @@
 package com.huda.money_track.controller;
 
 import com.huda.money_track.config.jwt.JwtService;
+import com.huda.money_track.config.jwt.UserInfoDetails;
 import com.huda.money_track.dto.AuthenticationRequestDto;
 import com.huda.money_track.dto.MemberInfoDto;
 import com.huda.money_track.entity.Member;
@@ -12,6 +13,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -20,6 +23,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.security.Principal;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
 
 @RestController
 @RequestMapping("/auth")
@@ -44,22 +52,28 @@ public class AuthenticationController {
         MemberInfoDto dto = memberService.getUserProfile(memberId);
         return new ResponseEntity<>(dto, HttpStatus.OK);
     }
-    
+
     @PatchMapping("/profile/edit")
     @ResponseStatus(HttpStatus.OK)
-    public void updateProfile(@RequestBody MemberInfoDto dto){
+    public void updateProfile(@RequestBody MemberInfoDto dto) {
         memberService.updateProfile(dto);
     }
 
     @PostMapping("/login")
-    public String authenticateAndGetToken(@RequestBody AuthenticationRequestDto authRequest) {
+    public Map<String, Object> authenticateAndGetToken(@RequestBody AuthenticationRequestDto authRequest) {
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(authRequest.getEmail(), authRequest.getPassword())
         );
         if (authentication.isAuthenticated()) {
-            return jwtService.generateToken(authRequest.getEmail());
+            UserInfoDetails userInfoDetails = (UserInfoDetails) authentication.getPrincipal();
+
+            Map<String, Object> map = new HashMap<>();
+            map.put("token", jwtService.generateToken(authRequest.getEmail()));
+            map.put("authentication", userInfoDetails);
+
+            return map;
         } else {
-            throw new NotFoundException("Invalid user request!");
+            throw new NotFoundException("Wrong email or password.");
         }
     }
 }
