@@ -15,6 +15,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -69,7 +70,7 @@ public class AuthenticationController {
 
             Map<String, Object> map = new HashMap<>();
             map.put("token", jwtService.generateToken(authRequest.getEmail()));
-            map.put("authentication", userInfoDetails);
+            map.put("id", userInfoDetails.getId());
 
             return map;
         } else {
