@@ -49,6 +49,9 @@ public class MemberService implements UserDetailsService {
         if (userInfo.getRole() == null || userInfo.getRole().getName().isEmpty() || userInfo.getRole().getName().isBlank()) {
             throw new InvalidInputParameter("Role is required.");
         }
+        if (userInfo.getBalance() == null) {
+            throw new InvalidInputParameter("Balance is required.");
+        }
         userInfo.setPassword(passwordEncoder.encode(userInfo.getPassword()));
         memberRepository.save(userInfo);
         return "Register User successfully";
@@ -76,7 +79,7 @@ public class MemberService implements UserDetailsService {
                 .memberId(memberId)
                 .qr(member.getQr())
                 .username(member.getUsername())
-                .image(member.getEmail())
+                .image(member.getImage())
                 .email(member.getEmail())
                 .balance(member.getBalance())
                 .build();
@@ -87,6 +90,13 @@ public class MemberService implements UserDetailsService {
         if (memberRepository.findByEmail(dto.getEmail()).isPresent()) {
             throw new InvalidInputParameter("Email has already exist.");
         }
+        if (dto.getEmail() != null && (dto.getEmail().isEmpty() || dto.getEmail().isBlank())) {
+            throw new InvalidInputParameter("Email is required.");
+        }
+        if (dto.getUsername() != null && (dto.getUsername().isEmpty() || dto.getUsername().isBlank())) {
+            throw new InvalidInputParameter("Username is required.");
+        }
+        
         Optional.ofNullable(dto.getBalance()).ifPresent(member::setBalance);
         Optional.ofNullable(dto.getImage()).ifPresent(member::setImage);
         Optional.ofNullable(dto.getUsername()).ifPresent(member::setUsername);
