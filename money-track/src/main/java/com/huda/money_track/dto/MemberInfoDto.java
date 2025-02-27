@@ -12,7 +12,7 @@ import java.math.BigDecimal;
 @NoArgsConstructor
 @AllArgsConstructor
 public class MemberInfoDto {
-    private Integer memberId;
+    private Integer id;
     private String username;
     private String email;
     private BigDecimal balance;

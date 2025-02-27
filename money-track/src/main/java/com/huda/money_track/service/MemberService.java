@@ -60,7 +60,7 @@ public class MemberService implements UserDetailsService {
     public List<MemberInfoDto> listAllMember() {
         List<Member> members = memberRepository.findAllByRole(Role.MEMBER);
         return members.stream().map(member -> MemberInfoDto.builder()
-                .memberId(member.getId())
+                .id(member.getId())
                 .email(member.getEmail())
                 .username(member.getUsername())
                 .qr(member.getQr())
@@ -76,7 +76,7 @@ public class MemberService implements UserDetailsService {
     public MemberInfoDto getUserProfile(Integer memberId) {
         Member member = checkExistMember(memberId);
         return MemberInfoDto.builder()
-                .memberId(memberId)
+                .id(memberId)
                 .qr(member.getQr())
                 .username(member.getUsername())
                 .image(member.getImage())
@@ -86,7 +86,7 @@ public class MemberService implements UserDetailsService {
     }
 
     public void updateProfile(MemberInfoDto dto) {
-        Member member = checkExistMember(dto.getMemberId());
+        Member member = checkExistMember(dto.getId());
         if (memberRepository.findByEmail(dto.getEmail()).isPresent()) {
             throw new InvalidInputParameter("Email has already exist.");
         }
