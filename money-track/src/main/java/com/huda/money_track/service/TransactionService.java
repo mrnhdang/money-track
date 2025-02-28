@@ -23,7 +23,10 @@ import java.util.Optional;
 public class TransactionService {
     private TransactionRepository transactionRepository;
     private MemberRepository memberRepository;
-
+    
+    private Member checkExistMember(Integer memberId) {
+        return memberRepository.findById(memberId).orElseThrow(() -> new NotFoundException("Member does not exist."));
+    }
     public List<Transaction> getMemberTransactionList(int pageNumber, int pageSize, String sortBy, Integer memberId) {
         Pageable pageable = PageRequest.of(pageNumber, pageSize, Sort.by(sortBy).descending());
         if (memberId != null) {
@@ -32,9 +35,10 @@ public class TransactionService {
         }
         return transactionRepository.findAll(pageable).getContent();
     }
-
-    private Member checkExistMember(Integer memberId) {
-        return memberRepository.findById(memberId).orElseThrow(() -> new NotFoundException("Member does not exist."));
+    
+    public Integer countMemberTransaction(Integer memberId){
+        Member member = checkExistMember(memberId);
+        return transactionRepository.countByMember(member);
     }
 
     public Transaction createNewTransaction(TransactionRecordDto dto) {
@@ -54,9 +58,9 @@ public class TransactionService {
     public Integer updateTransaction(TransactionRecordDto dto, Integer transactionId) {
         Member member = checkExistMember(dto.memberId());
         Transaction transaction = transactionRepository.findById(transactionId).orElseThrow(() -> new NotFoundException("Transaction does not exist."));
-        Optional.of(dto.transactionDatetime()).ifPresent(transaction::setTransactionDatetime);
-        Optional.of(dto.description()).ifPresent(transaction::setDescription);
-        Optional.of(member).ifPresent(transaction::setMember);
+        Optional.ofNullable(dto.transactionDatetime()).ifPresent(transaction::setTransactionDatetime);
+        Optional.ofNullable(dto.description()).ifPresent(transaction::setDescription);
+        Optional.ofNullable(member).ifPresent(transaction::setMember);
         Optional.of(dto.amount()).ifPresent(transaction::setAmount);
         Transaction createdTransaction = transactionRepository.save(transaction);
 
@@ -66,6 +70,9 @@ public class TransactionService {
     }
 
     private void updateMemberBalance(Member member, BigDecimal amount) {
+        /*
+        TODO: Need to figure out how to calculate member's balance when create and delete transaction. 
+        */
         BigDecimal newBalance = member.getBalance().add(amount);
         member.setBalance(newBalance);
         memberRepository.save(member);

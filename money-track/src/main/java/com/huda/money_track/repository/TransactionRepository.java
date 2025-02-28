@@ -12,4 +12,5 @@ import java.util.List;
 public interface TransactionRepository extends JpaRepository<Transaction, Integer> {
     List<Transaction> findAllByMember(Member member, Pageable pageable);
     void deleteAllByMember(Member member);
+    Integer countByMember(Member member);
 }

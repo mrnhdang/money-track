@@ -30,11 +30,14 @@ public class TransactionController {
 
     @GetMapping("")
     @ResponseStatus(HttpStatus.OK)
-    public List<Transaction> getMemberTransactionList(@RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber,
-                                                      @RequestParam(name = "pageSize", required = false, defaultValue = "5") int pageSize,
-                                                      @RequestParam(name = "sortBy", required = false, defaultValue = "id") String sortBy,
-                                                      @RequestParam(name = "memberId", required = false, defaultValue = "") Integer memberId) {
+    public List<Transaction> getMemberTransactionList(@RequestParam(name = "pageNumber", required = false, defaultValue = "0") int pageNumber, @RequestParam(name = "pageSize", required = false, defaultValue = "5") int pageSize, @RequestParam(name = "sortBy", required = false, defaultValue = "id") String sortBy, @RequestParam(name = "memberId", required = false, defaultValue = "") Integer memberId) {
         return transactionService.getMemberTransactionList(pageNumber, pageSize, sortBy, memberId);
+    }
+
+    @GetMapping("/countTotalPage/{id}")
+    @ResponseStatus(HttpStatus.OK)
+    public Integer countMemberTransactions(@PathVariable(name = "id", required = false) Integer memberId) {
+        return transactionService.countMemberTransaction(memberId);
     }
 
     @PostMapping("")
